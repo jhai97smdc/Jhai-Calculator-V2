@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Real Estate Auto-Calculator – Jhai Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#0056B3; --accent:#F59E0B; --ink:#111827; --muted:#6B7280; --bg:#F8FAFC; --card:#FFFFFF; --good:#059669;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{padding:20px 16px;background:#0B5AA0;color:#fff;position:sticky;top:0;z-index:2}
+  header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.2px}
+  header small{opacity:.9}
+  .wrap{max-width:1100px;margin:22px auto;padding:0 16px}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .card{grid-column:span 12;background:var(--card);border-radius:14px;box-shadow:0 8px 24px rgba(2,6,23,.06);padding:18px}
+  .card h2{margin:0 0 10px;font-size:16px;font-weight:800;color:#0B5AA0}
+  .two{grid-column:span 12}
+  @media(min-width:960px){.two{grid-column:span 6}}
+  label{display:block;font-size:12px;color:var(--muted);margin:8px 0 6px}
+  input,select,textarea{
+    width:100%;padding:12px 12px;border:1px solid #E5E7EB;border-radius:10px;background:#fff;
+    font:inherit
+  }
+  input[type="number"]{text-align:right}
+  .row{display:grid;grid-template-columns:1fr 180px;gap:12px;align-items:center}
+  .tight .row{grid-template-columns:1fr 140px}
+  .inline{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .kpi{display:flex;justify-content:space-between;align-items:center;border:1px dashed #E5E7EB;border-radius:12px;padding:12px 14px;margin-top:10px}
+  .kpi strong{font-size:18px}
+  .muted{color:var(--muted)}
+  .money{font-variant-numeric:tabular-nums}
+  .badge{display:inline-block;background:#E6F6EF;color:#065F46;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:700}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{padding:10px;border-bottom:1px solid #F1F5F9;text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  tfoot td{font-weight:800}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  button{
+    border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:var(--brand);color:#fff
+  }
+  button.secondary{background:#E5E7EB;color:#111827}
+  .footnote{font-size:12px;color:var(--muted);margin-top:8px}
+  .brandbar{display:flex;gap:12px;align-items:center}
+  .brandbar b{font-size:14px}
+  .small{font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brandbar">
+    <div>
+      <h1>South-Style Unit Calculator</h1>
+      <small>Auto-compute discounts, charges, VAT, DP & bank amortization</small>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- Unit Details -->
+    <section class="card two">
+      <h2>Unit Details</h2>
+      <div class="inline">
+        <div>
+          <label>Project</label>
+          <input id="project" placeholder="e.g., SOUTH Residences" />
+        </div>
+        <div>
+          <label>Unit No.</label>
+          <input id="unitNo" placeholder="Tower 3 / 9F / Unit 16" />
+        </div>
+        <div>
+          <label>Area (sqm)</label>
+          <input id="area" type="number" step="0.01" />
+        </div>
+        <div>
+          <label>View</label>
+          <input id="view" placeholder="Mall View" />
+        </div>
+      </div>
+      <div class="inline" style="margin-top:10px">
+        <div>
+          <label>Selling Price (₱)</label>
+          <input id="selling" type="number" step="0.01" />
+        </div>
+        <div>
+          <label>Spot Discount (%)</label>
+          <input id="spotPct" type="number" step="0.01" />
+        </div>
+        <div>
+          <label>Special Discount (₱)</label>
+          <input id="specialLess" type="number" step="0.01" />
+        </div>
+        <div>
+          <label>Reservation Fee (₱)</label>
+          <input id="reservation" type="number" step="0.01" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Charges & VAT -->
+    <section class="card two tight">
+      <h2>Other Charges & VAT</h2>
+      <div class="row">
+        <label>Other Charges (%)</label>
+        <input id="otherPct" type="number" step="0.0001" />
+      </div>
+      <div class="row">
+        <label>VAT (%)</label>
+        <input id="vatPct" type="number" step="0.0001" />
+      </div>
+      <div class="row">
+        <label>Downpayment (%)</label>
+        <input id="dpPct" type="number" step="0.0001" />
+      </div>
+      <div class="kpi">
+        <div class="badge">Auto</div>
+        <div><span class="muted small">Remaining Balance</span><br>
+          <strong class="money" id="remainKpi">₱0.00</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Summary -->
+    <section class="card two">
+      <h2>Breakdown Summary</h2>
+      <table>
+        <tbody id="summaryBody"></tbody>
+        <tfoot>
+          <tr>
+            <td>Total Amount Payable</td>
+            <td class="money" id="totalPayable">₱0.00</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="actions">
+        <button id="printBtn">Print / Save as PDF</button>
+        <button class="secondary" id="resetBtn">Reset</button>
+        <button class="secondary" id="saveBtn">Save to Browser</button>
+        <button class="secondary" id="loadBtn">Load Saved</button>
+      </div>
+      <div class="footnote">Saved data uses your browser’s local storage (per device). No server needed.</div>
+    </section>
+
+    <!-- Payment Terms -->
+    <section class="card two">
+      <h2>Payment Terms</h2>
+      <table>
+        <tbody id="termsBody"></tbody>
+      </table>
+    </section>
+
+    <!-- Bank Computation -->
+    <section class="card two">
+      <h2>Bank Amortization</h2>
+      <div class="inline">
+        <div>
+          <label>Annual Interest (%)</label>
+          <input id="rate" type="number" step="0.0001" />
+        </div>
+        <div>
+          <label>Loan Tenors (years, comma-sep)</label>
+          <input id="tenors" placeholder="10,15,20" />
+        </div>
+        <div>
+          <label>Grace Months (optional)</label>
+          <input id="grace" type="number" step="1" value="0" />
+        </div>
+        <div>
+          <label>Show Effective Rate Note</label>
+          <select id="showRateNote">
+            <option value="yes" selected>Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Tenor</th><th>Monthly (₱)</th><th>Assumed Rate</th></tr>
+        </thead>
+        <tbody id="bankBody"></tbody>
+      </table>
+      <div id="rateNote" class="footnote">
+        * Monthly = PMT(r/12, n, PV). Change the interest or years anytime. Values are estimates.
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  const peso = n => "₱" + (isFinite(n) ? n.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2}) : "0.00");
+  const num = id => parseFloat(document.getElementById(id).value || 0);
+
+  function compute() {
+    const selling     = num('selling');
+    const spotPct     = num('spotPct')/100;
+    const specialLess = num('specialLess');
+    const otherPct    = num('otherPct')/100;
+    const vatPct      = num('vatPct')/100;
+    const dpPct       = num('dpPct')/100;
+    const reservation = num('reservation');
+
+    const spotDisc    = selling * spotPct;
+    const discounted  = selling - spotDisc - specialLess;
+    const otherChg    = discounted * otherPct;
+    const vat         = discounted * vatPct;
+    const total       = discounted + otherChg + vat;
+
+    const dp          = total * dpPct;
+    const netDp       = Math.max(dp - reservation, 0);
+    const remaining   = total - dp;
+
+    const summary = [
+      ["Selling Price", selling],
+      [`Spot Discount (${(spotPct*100).toFixed(2)}%)`, -spotDisc],
+      ["Special Discount", -specialLess],
+      ["Discounted Price", discounted, true],
+      [`Other Charges (${(otherPct*100).toFixed(2)}%)`, otherChg],
+      [`Add: VAT (${(vatPct*100).toFixed(2)}%)`, vat],
+    ];
+
+    const sb = document.getElementById('summaryBody');
+    sb.innerHTML = summary.map(([label, value, emph]) =>
+      `<tr${emph? ' style="font-weight:800"':''}>
+        <td>${label}</td><td class="money">${peso(value)}</td>
+      </tr>`).join("");
+
+    document.getElementById('totalPayable').textContent = peso(total);
+
+    const tb = document.getElementById('termsBody');
+    tb.innerHTML = `
+      <tr><td>Downpayment (${(dpPct*100).toFixed(2)}%)</td><td class="money">${peso(dp)}</td></tr>
+      <tr><td>Less Reservation Fee</td><td class="money">-${peso(reservation)}</td></tr>
+      <tr style="font-weight:800"><td>Net Downpayment</td><td class="money">${peso(netDp)}</td></tr>
+      <tr><td>Remaining Balance</td><td class="money">${peso(remaining)}</td></tr>`;
+
+    document.getElementById('remainKpi').textContent = peso(remaining);
+
+    const r = num('rate')/100/12;
+    const tenors = (document.getElementById('tenors').value || '')
+                    .split(',').map(s=>parseInt(s.trim(),10)).filter(x=>x>0);
+    const grace = Math.max(parseInt(document.getElementById('grace').value||0,10),0);
+
+    const bankBody = document.getElementById('bankBody');
+    bankBody.innerHTML = tenors.map(y=>{
+      const n = y*12;
+      const pv = remaining;
+      const pmt = (r===0) ? (pv/n) : (r*pv)/(1-Math.pow(1+r,-n));
+      const display = isFinite(pmt) ? peso(pmt) : "—";
+      const rateTxt = (num('rate')||0).toFixed(2)+"% p.a.";
+      return `<tr><td>${y} yrs${grace?` (+${grace}m grace)`:''}</td><td class="money">${display}</td><td>${rateTxt}</td></tr>`;
+    }).join("");
+
+    const showNote = document.getElementById('showRateNote').value === 'yes';
+    document.getElementById('rateNote').style.display = showNote ? 'block' : 'none';
+  }
+
+  function setDefaults(){
+    document.getElementById('project').value    = "SOUTH Residences";
+    document.getElementById('unitNo').value     = "Tower 3 / 9F / Unit 16";
+    document.getElementById('area').value       = 36.53;
+    document.getElementById('view').value       = "Mall View";
+
+    document.getElementById('selling').value    = 5521000;
+    document.getElementById('spotPct').value    = 21;
+    document.getElementById('specialLess').value= 200000;
+
+    document.getElementById('otherPct').value   = 8.5;
+    document.getElementById('vatPct').value     = 12;
+
+    document.getElementById('dpPct').value      = 5;
+    document.getElementById('reservation').value= 30000;
+
+    document.getElementById('rate').value       = 6.5;
+    document.getElementById('tenors').value     = "10,15,20";
+    compute();
+  }
+
+  document.addEventListener('input', e=>{
+    if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) compute();
+  });
+
+  document.getElementById('printBtn').onclick = ()=>window.print();
+  document.getElementById('resetBtn').onclick = ()=>{ document.querySelectorAll('input').forEach(i=>i.value=''); compute(); };
+  document.getElementById('saveBtn').onclick  = ()=>{
+    const data = {};
+    document.querySelectorAll('input,select,textarea').forEach(el=>data[el.id]=el.value);
+    localStorage.setItem('jhaiCalc', JSON.stringify(data));
+    alert('Saved on this device.');
+  };
+  document.getElementById('loadBtn').onclick  = ()=>{
+    const raw = localStorage.getItem('jhaiCalc');
+    if(!raw){ alert('No saved data yet.'); return; }
+    const data = JSON.parse(raw);
+    Object.entries(data).forEach(([k,v])=>{
+      const el = document.getElementById(k);
+      if(el) el.value = v;
+    });
+    compute();
+  };
+
+  setDefaults();
+</script>
+</body>
+</html>
